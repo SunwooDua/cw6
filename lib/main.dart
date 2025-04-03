@@ -65,7 +65,10 @@ class _TaskHomePageState extends State<TaskHomePage> {
                 _firestore.collection('task').add({
                   'name': name,
                   'explanation': explanation,
+                  'completed':
+                      false, // add completed for check box. default is false
                 });
+                Navigator.of(context).pop();
               },
               child: Text("Add"),
             ),
@@ -73,6 +76,13 @@ class _TaskHomePageState extends State<TaskHomePage> {
         );
       },
     );
+  }
+
+  void toggleCompletion(String ItemId, bool isCompleted) {
+    // toggle checkbox
+    _firestore.collection('task').doc(ItemId).update({
+      'completed': !isCompleted,
+    });
   }
 
   // Firebase Firestore instance
@@ -98,7 +108,10 @@ class _TaskHomePageState extends State<TaskHomePage> {
               itemCount: items.length,
               itemBuilder: (context, index) {
                 var item = items[index].data() as Map<String, dynamic>;
-                String itemId = items[index].id; // used for deletion
+                String itemId =
+                    items[index].id; // used for deletion,update, chck
+                bool isCompleted = item['completed'] ?? false;
+
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
@@ -106,9 +119,14 @@ class _TaskHomePageState extends State<TaskHomePage> {
                       border: Border.all(color: Colors.black),
                     ),
                     child: ListTile(
-                      leading: Icon(Icons.check_box),
+                      leading: Checkbox(
+                        value: isCompleted,
+                        onChanged: (value) {
+                          toggleCompletion(itemId, isCompleted);
+                        },
+                      ),
                       title: Text(item['name'] ?? 'Unknown Item'),
-                      subtitle: Text(item['quantity'].toString() ?? '0'),
+                      subtitle: Text(item['explanation'].toString() ?? '0'),
                       trailing: ElevatedButton(
                         onPressed: () {
                           deleteItem(itemId);
