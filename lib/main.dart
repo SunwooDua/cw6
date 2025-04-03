@@ -5,54 +5,54 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(InventoryApp());
+  runApp(TaskApp());
 }
 
-class InventoryApp extends StatelessWidget {
+class TaskApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Inventory Management App',
+      title: 'Task Management App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: InventoryHomePage(title: 'Inventory Home Page'),
+      home: TaskHomePage(title: 'Task Home Page'),
     );
   }
 }
 
-class InventoryHomePage extends StatefulWidget {
-  InventoryHomePage({Key? key, required this.title}) : super(key: key);
+class TaskHomePage extends StatefulWidget {
+  TaskHomePage({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
-  _InventoryHomePageState createState() => _InventoryHomePageState();
+  _TaskHomePageState createState() => _TaskHomePageState();
 }
 
-class _InventoryHomePageState extends State<InventoryHomePage> {
+class _TaskHomePageState extends State<TaskHomePage> {
   // delete button
   void deleteItem(String itemId) {
-    _firestore.collection('inventory').doc(itemId).delete();
+    _firestore.collection('task').doc(itemId).delete();
   }
 
   void itemAdd() {
     final TextEditingController nameController = TextEditingController();
-    final TextEditingController quantityController = TextEditingController();
+    final TextEditingController explanationController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("add new item"),
+          title: Text("add new task"),
           content: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: InputDecoration(labelText: 'Item Name'),
+                decoration: InputDecoration(labelText: 'Task Name'),
               ),
               TextField(
-                controller: quantityController,
-                decoration: InputDecoration(labelText: 'Number of Item'),
+                controller: explanationController,
+                decoration: InputDecoration(labelText: 'Explanation of Task'),
               ),
             ],
           ),
@@ -61,57 +61,13 @@ class _InventoryHomePageState extends State<InventoryHomePage> {
               onPressed: () {
                 // button
                 String name = nameController.text.trim();
-                int quantity =
-                    int.tryParse(quantityController.text.trim()) ?? 0;
-                _firestore.collection('inventory').add({
+                String explanation = explanationController.text.trim();
+                _firestore.collection('task').add({
                   'name': name,
-                  'quantity': quantity,
+                  'explanation': explanation,
                 });
               },
               child: Text("Add"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void itemUpdate(String itemId) {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController quantityController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("update item"),
-          content: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: 'Item Name'),
-              ),
-              TextField(
-                controller: quantityController,
-                decoration: InputDecoration(labelText: 'Number of Item'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // button
-                String name = nameController.text.trim();
-                int quantity =
-                    int.tryParse(quantityController.text.trim()) ?? 0;
-                _firestore.collection('inventory').doc(itemId).update({
-                  'name': name,
-                  'quantity': quantity,
-                });
-              },
-              child: Text("Update"),
             ),
           ],
         );
@@ -129,7 +85,7 @@ class _InventoryHomePageState extends State<InventoryHomePage> {
       appBar: AppBar(title: Text(widget.title), backgroundColor: Colors.blue),
       body: Center(
         child: StreamBuilder<QuerySnapshot>(
-          stream: _firestore.collection('inventory').snapshots(),
+          stream: _firestore.collection('task').snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator(); // Loading indicator
@@ -150,12 +106,7 @@ class _InventoryHomePageState extends State<InventoryHomePage> {
                       border: Border.all(color: Colors.black),
                     ),
                     child: ListTile(
-                      leading: ElevatedButton(
-                        onPressed: () {
-                          itemUpdate(itemId);
-                        },
-                        child: Text('update'),
-                      ),
+                      leading: Icon(Icons.check_box),
                       title: Text(item['name'] ?? 'Unknown Item'),
                       subtitle: Text(item['quantity'].toString() ?? '0'),
                       trailing: ElevatedButton(
@@ -176,7 +127,7 @@ class _InventoryHomePageState extends State<InventoryHomePage> {
         onPressed: () {
           itemAdd();
         },
-        tooltip: 'Add Item',
+        tooltip: 'Add Task',
         child: Icon(Icons.add),
       ),
     );
