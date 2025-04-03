@@ -1,47 +1,32 @@
 plugins {
-    id("com.android.application")
-    // START: FlutterFire Configuration
-    id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id("dev.flutter.flutter-gradle-plugin")
+    id 'com.android.application'
+    id 'com.google.gms.google-services'  // Add this line to apply Firebase services
 }
 
 android {
-    namespace = "com.example.cw6"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
+    compileSdkVersion 33  // Or whatever the latest version is
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.cw6"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        applicationId "com.example.yourapp"
+        minSdkVersion 21
+        targetSdkVersion 33
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig signingConfigs.release
         }
     }
+
+    // Additional configurations can go here
 }
 
-flutter {
-    source = "../.."
+dependencies {
+    implementation 'com.google.firebase:firebase-auth:21.0.5'  // Firebase Auth
+    implementation 'com.google.firebase:firebase-firestore:24.0.1'  // Firebase Firestore
+    implementation 'com.google.android.material:material:1.6.0'  // Material Design
+    implementation 'androidx.appcompat:appcompat:1.4.1'  // Support for Material
 }

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:firebase_auth/firebase_auth.dart'; // for sign in
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +15,7 @@ class TaskApp extends StatelessWidget {
     return MaterialApp(
       title: 'Task Management App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: TaskHomePage(title: 'Task Home Page'),
+      home: TaskHomePage(title: 'Task Homepage'),
     );
   }
 }
@@ -28,6 +29,11 @@ class TaskHomePage extends StatefulWidget {
 }
 
 class _TaskHomePageState extends State<TaskHomePage> {
+  // log out
+  void logout() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
   // delete button
   void deleteItem(String itemId) {
     _firestore.collection('task').doc(itemId).delete();
@@ -92,7 +98,11 @@ class _TaskHomePageState extends State<TaskHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title), backgroundColor: Colors.blue),
+      appBar: AppBar(
+        title: Text(widget.title),
+        backgroundColor: Colors.blue,
+        actions: [IconButton(onPressed: logout, icon: Icon(Icons.logout))],
+      ),
       body: Center(
         child: StreamBuilder<QuerySnapshot>(
           stream: _firestore.collection('task').snapshots(),
